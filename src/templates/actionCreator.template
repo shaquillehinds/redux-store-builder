@@ -1,0 +1,9 @@
+import { Dispatch } from 'redux';
+import { {{state}}Action } from '@store/actions';
+import { {{state}}ActionType } from '@store/actionTypes';
+
+export default function {{functionName}}(payload: {{payload}}) {
+  return async function (dispatch: Dispatch<{{state}}Action>) {
+    dispatch({ type: {{state}}ActionType.{{actionType}}, payload });
+  };
+}

@@ -1,0 +1,13 @@
+import { {{Name}}Action } from '@store/actions';
+import { {{Name}}ActionType } from '@store/actionTypes';
+
+const initialState: {{Name}}State = {};
+
+const {{name}}Reducer = (state = initialState, action: {{Name}}Action): {{Name}}State => {
+  switch (action.type) {
+    default:
+      return state;
+  }
+};
+
+export default {{name}}Reducer;
