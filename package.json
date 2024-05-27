@@ -1,6 +1,6 @@
 {
   "name": "@shaquillehinds/redux-store-builder",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "Create and manipulate a redux store from the command line",
   "repository": {
     "type": "git",
@@ -8,7 +8,7 @@
   },
   "main": "dist/index.js",
   "bin": {
-    "gql-api": "dist/index.bin.js"
+    "store-builder": "dist/index.bin.js"
   },
   "author": {
     "name": "Shaquille Hinds",
@@ -24,6 +24,7 @@
     "dist/**/*"
   ],
   "scripts": {
+    "prebuild": "rm -rf src/hooks && rm -rf src/store",
     "build": "rm -rf dist && tsc -p ./ && tsc-alias -p ./tsconfig.json && cp -r src/templates dist && chmod +x dist/index.bin.js",
     "build-exec-bin": "yarn build && node dist/index.bin.js",
     "exec-bin": "node dist/index.bin.js",
