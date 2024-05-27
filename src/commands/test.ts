@@ -11,6 +11,7 @@ async function runInjections() {
     property: "someProperty",
     propertyType: "SomeInterface",
     defaultValue: { test: true },
+    addReducer: false,
   });
 }
 runInjections();

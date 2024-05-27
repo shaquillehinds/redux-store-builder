@@ -1,4 +1,4 @@
 interface UserState {
+  email: string;
   phone: string;
-  firstName: string;
 }

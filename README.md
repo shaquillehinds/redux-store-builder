@@ -19,6 +19,7 @@ store-builder state <nameOfState>
 Options:
 
 - `-a, --add <property>  Adds a property to the store state`
+- `-R, --no-reducer  Disables adding a reducer case and actions`
 
 ## Help
 

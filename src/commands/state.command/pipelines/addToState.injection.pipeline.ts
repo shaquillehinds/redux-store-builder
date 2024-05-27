@@ -8,6 +8,7 @@ interface AddToStateProps {
   propertyType: string;
   isPropertyTypeString?: boolean;
   defaultValue: any;
+  addReducer: boolean;
 }
 
 export function camelToUpperSnake(str: string) {
@@ -25,8 +26,12 @@ export default async function addToState(props: AddToStateProps) {
   const setPropertyUS = "SET_" + camelToUpperSnake(props.property);
   console.log(setPropertyUS);
 
-  await new InjectionPipeline(`src/store/reducers/${stateFL}.reducer.ts`)
-    .injectSwitchCase(
+  const reducerPipeline = new InjectionPipeline(
+    `src/store/reducers/${stateFL}.reducer.ts`
+  );
+
+  if (props.addReducer)
+    reducerPipeline.injectSwitchCase(
       {
         caseName: `${stateFU}ActionType.${setPropertyUS}`,
         statements: [
@@ -37,21 +42,27 @@ export default async function addToState(props: AddToStateProps) {
         identifier: true,
       },
       { name: "action.type" }
-    )
-    .injectProperty(
-      { key: props.property, value: props.defaultValue },
-      { name: "initialState" }
-    )
+    );
 
-    .parse(`src/store/actionTypes/${stateFL}.actionTypes.ts`)
-    .injectTSEnumMember(
-      { key: setPropertyUS, value: setPropertyUS },
-      { name: `${stateFU}ActionType` }
-    )
+  reducerPipeline.injectProperty(
+    { key: props.property, value: props.defaultValue },
+    { name: "initialState" }
+  );
 
-    .parse(`src/store/actions/${stateFL}.action.ts`)
-    .injectStringTemplate({
-      template: `
+  const actionTypesPipeline = reducerPipeline.parse(
+    `src/store/actionTypes/${stateFL}.actionTypes.ts`
+  );
+
+  if (props.addReducer)
+    actionTypesPipeline
+      .injectTSEnumMember(
+        { key: setPropertyUS, value: setPropertyUS },
+        { name: `${stateFU}ActionType` }
+      )
+
+      .parse(`src/store/actions/${stateFL}.action.ts`)
+      .injectStringTemplate({
+        template: `
 
 interface Set${propertyFU} {
   type: ${stateFU}ActionType.${setPropertyUS};
@@ -61,12 +72,17 @@ interface Set${propertyFU} {
 }
 
   `,
-    })
-    .injectTSTypeAlias(
-      { type: "union", stringTemplate: `Set${propertyFU}`, forceInject: true },
-      { name: `${stateFU}Action` }
-    )
+      })
+      .injectTSTypeAlias(
+        {
+          type: "union",
+          stringTemplate: `Set${propertyFU}`,
+          forceInject: true,
+        },
+        { name: `${stateFU}Action` }
+      );
 
+  const statePipeline = actionTypesPipeline
     .parse("src/@types/state.d.ts")
     .injectTSInterfaceBody(
       {
@@ -77,32 +93,40 @@ interface Set${propertyFU} {
         }}`,
       },
       { name: `${stateFU}State` }
-    )
+    );
 
-    .parse(`src/store/actionCreators/${stateFL}/index.ts`)
-    .injectImport({
-      isDefault: true,
-      source: `./set${propertyFU}.actionCreator`,
-      importName: `set${propertyFU}`,
-    })
-    .injectNamedExportProperty({ name: `set${propertyFU}` })
+  const actionCreatorPipeline = statePipeline.parse(
+    `src/store/actionCreators/${stateFL}/index.ts`
+  );
 
-    .injectFileFromTemplate({
-      newFilePath: `src/store/actionCreators/${stateFL}/set${propertyFU}.actionCreator.ts`,
-      templatePath: templatePath("actionCreator"),
-      replaceKeywords: [
-        {
-          keyword: "{{payload}}",
-          replacement: props.isPropertyTypeString
-            ? `'${props.propertyType}'`
-            : props.propertyType,
-        },
-        { keyword: "{{state}}", replacement: stateFU },
-        { keyword: "{{actionType}}", replacement: setPropertyUS },
-        { keyword: "{{functionName}}", replacement: `set${propertyFU}` },
-      ],
-    })
-    .finish([
-      `src/store/actionCreators/${stateFL}/set${propertyFU}.actionCreator.ts`,
-    ]);
+  if (props.addReducer)
+    actionCreatorPipeline
+      .injectImport({
+        isDefault: true,
+        source: `./set${propertyFU}.actionCreator`,
+        importName: `set${propertyFU}`,
+      })
+      .injectNamedExportProperty({ name: `set${propertyFU}` })
+
+      .injectFileFromTemplate({
+        newFilePath: `src/store/actionCreators/${stateFL}/set${propertyFU}.actionCreator.ts`,
+        templatePath: templatePath("actionCreator"),
+        replaceKeywords: [
+          {
+            keyword: "{{payload}}",
+            replacement: props.isPropertyTypeString
+              ? `'${props.propertyType}'`
+              : props.propertyType,
+          },
+          { keyword: "{{state}}", replacement: stateFU },
+          { keyword: "{{actionType}}", replacement: setPropertyUS },
+          { keyword: "{{functionName}}", replacement: `set${propertyFU}` },
+        ],
+      });
+
+  const filesToOpen = [
+    `src/store/actionCreators/${stateFL}/set${propertyFU}.actionCreator.ts`,
+  ];
+  if (props.addReducer) await actionCreatorPipeline.finish(filesToOpen);
+  else await actionCreatorPipeline.finish();
 }
