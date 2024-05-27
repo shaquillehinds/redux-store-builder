@@ -9,6 +9,15 @@ const type = async () =>
     })
   ).propertyType;
 
+const propertyName = async () =>
+  (
+    await inquirer.prompt({
+      name: "propertyName",
+      type: "input",
+      message: "What is the name of this property?",
+    })
+  ).propertyName;
+
 const defaultValue = async () =>
   (
     await inquirer.prompt({
@@ -18,6 +27,18 @@ const defaultValue = async () =>
     })
   ).defaultValue;
 
-const addToStatePrompts = { type, defaultValue };
+const stateAction = async () =>
+  (
+    await inquirer.prompt({
+      name: "stateAction",
+      type: "list",
+      message: "What action would you like to perform on the state?",
+      default: 0,
+      loop: true,
+      choices: [{ value: "add", name: "Add property to state" }],
+    })
+  ).stateAction;
+
+const addToStatePrompts = { type, defaultValue, stateAction, propertyName };
 
 export default addToStatePrompts;
