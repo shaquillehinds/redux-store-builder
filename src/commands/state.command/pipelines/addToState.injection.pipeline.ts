@@ -1,6 +1,7 @@
 import InjectionPipeline, { statements } from "tscodeinject";
 import checkFiles from "../../../utils/fileChecker";
 import { templatePath } from "../../../utils/constants";
+import src from "@src/utils/src";
 
 interface AddToStateProps {
   state: string;
@@ -24,10 +25,10 @@ export default async function addToState(props: AddToStateProps) {
   const stateFL = props.state[0].toLowerCase() + props.state.slice(1);
   const propertyFU = props.property[0].toUpperCase() + props.property.slice(1);
   const setPropertyUS = "SET_" + camelToUpperSnake(props.property);
-  console.log(setPropertyUS);
+  console.log($lf(28), setPropertyUS);
 
   const reducerPipeline = new InjectionPipeline(
-    `src/store/reducers/${stateFL}.reducer.ts`
+    src(`store/reducers/${stateFL}.reducer.ts`)
   );
 
   if (props.addReducer)
@@ -50,7 +51,7 @@ export default async function addToState(props: AddToStateProps) {
   );
 
   const actionTypesPipeline = reducerPipeline.parse(
-    `src/store/actionTypes/${stateFL}.actionTypes.ts`
+    src(`store/actionTypes/${stateFL}.actionTypes.ts`)
   );
 
   if (props.addReducer)
@@ -60,7 +61,7 @@ export default async function addToState(props: AddToStateProps) {
         { name: `${stateFU}ActionType` }
       )
 
-      .parse(`src/store/actions/${stateFL}.action.ts`)
+      .parse(src(`store/actions/${stateFL}.action.ts`))
       .injectStringTemplate({
         template: `
 
@@ -83,7 +84,7 @@ interface Set${propertyFU} {
       );
 
   const statePipeline = actionTypesPipeline
-    .parse("src/@types/state.d.ts")
+    .parse(src("@types/state.d.ts"))
     .injectTSInterfaceBody(
       {
         bodyStringTemplate: `{${props.property}: ${
@@ -96,7 +97,7 @@ interface Set${propertyFU} {
     );
 
   const actionCreatorPipeline = statePipeline.parse(
-    `src/store/actionCreators/${stateFL}/index.ts`
+    src(`store/actionCreators/${stateFL}/index.ts`)
   );
 
   if (props.addReducer)
@@ -109,7 +110,9 @@ interface Set${propertyFU} {
       .injectNamedExportProperty({ name: `set${propertyFU}` })
 
       .injectFileFromTemplate({
-        newFilePath: `src/store/actionCreators/${stateFL}/set${propertyFU}.actionCreator.ts`,
+        newFilePath: src(
+          `store/actionCreators/${stateFL}/set${propertyFU}.actionCreator.ts`
+        ),
         templatePath: templatePath("actionCreator"),
         replaceKeywords: [
           {
@@ -125,8 +128,15 @@ interface Set${propertyFU} {
       });
 
   const filesToOpen = [
-    `src/store/actionCreators/${stateFL}/set${propertyFU}.actionCreator.ts`,
+    src(`store/actionCreators/${stateFL}/set${propertyFU}.actionCreator.ts`),
   ];
   if (props.addReducer) await actionCreatorPipeline.finish(filesToOpen);
   else await actionCreatorPipeline.finish();
+}
+
+function $lf(n: number) {
+  return (
+    "$lf|state.command/pipelines/addToState.injection.pipeline.ts:" + n + " >"
+  );
+  // Automatically injected by Log Location Injector vscode extension
 }

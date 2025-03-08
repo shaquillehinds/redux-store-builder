@@ -1,16 +1,18 @@
+//$lf-ignore
 import { Command } from "commander";
 import fs from "fs";
 import cp from "child_process";
 import checkFiles from "../utils/fileChecker";
 import { RequiredFiles, requiredFiles } from "../@types";
 import chalk from "chalk";
+import src from "@src/utils/src";
 
 export default function createStoreCommand(program: Command) {
   program
     .command("create")
     .description("Creates the redux store")
     .action(async () => {
-      if (fs.existsSync("src/store/index.ts"))
+      if (fs.existsSync(src("store/index.ts")))
         throw new Error("Store already created");
       checkFiles({ autoCreate: requiredFiles as unknown as RequiredFiles[] });
       const packageJSON = fs.readFileSync("package.json", "utf-8");
@@ -26,12 +28,12 @@ export default function createStoreCommand(program: Command) {
       if (hasRedux && hasThunk && ((isReact && hasReactRedux) || !isReact))
         process.exit(0);
       if (isReact) {
-        let exists = fs.existsSync("src/hooks");
-        if (!exists) fs.mkdirSync("src/hooks");
-        exists = fs.existsSync("src/hooks/useTypedSelector.ts");
+        let exists = fs.existsSync(src("hooks"));
+        if (!exists) fs.mkdirSync(src("hooks"));
+        exists = fs.existsSync(src("hooks/useTypedSelector.ts"));
         if (!exists)
           fs.writeFileSync(
-            "src/hooks/useTypedSelector.ts",
+            src("hooks/useTypedSelector.ts"),
             `import { useSelector, TypedUseSelectorHook } from 'react-redux';
 import { State } from '../store/reducers';
         
