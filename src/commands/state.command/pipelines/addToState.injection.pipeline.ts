@@ -13,9 +13,7 @@ interface AddToStateProps {
 }
 
 export function camelToUpperSnake(str: string) {
-  return str
-    .replace(/[A-Z]/g, (letter) => `${letter.toUpperCase()}`)
-    .toUpperCase();
+  return str.replace(/[A-Z]/g, (letter) => `_${letter}`).toUpperCase();
 }
 
 export default async function addToState(props: AddToStateProps) {
