@@ -24,21 +24,22 @@
     "dist/**/*"
   ],
   "scripts": {
-    "prebuild": "rm -rf src/hooks && rm -rf src/store",
+    "prebuild": "rm -rf src/hooks",
     "build": "rm -rf dist && tsc -p ./ && tsc-alias -p ./tsconfig.json && cp -r src/templates dist && chmod +x dist/index.bin.js",
     "build-exec-bin": "yarn build && node dist/index.bin.js",
     "exec-bin": "node dist/index.bin.js",
-    "prenpm-pub": "yarn build",
+    "prenpm-pub": "rm -rf src/store && yarn build",
     "npm-pub": "npm publish --access public"
   },
   "dependencies": {
+    "@types/jscodeshift": "^0.12.0",
     "chalk": "^5.3.0",
     "commander": "^11.0.0",
     "inquirer": "^9.2.10",
     "react-redux": "^8.1.2",
     "redux": "^4.2.1",
     "redux-thunk": "^2.4.2",
-    "tscodeinject": "^1.2.0"
+    "tscodeinject": "3.1.0"
   },
   "devDependencies": {
     "@types/inquirer": "^9.0.3",

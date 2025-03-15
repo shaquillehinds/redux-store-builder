@@ -1,7 +1,8 @@
-import InjectionPipeline, { statements } from "tscodeinject";
+import { InjectionPipeline } from "tscodeinject";
 import checkFiles from "../../../utils/fileChecker";
 import { templatePath } from "../../../utils/constants";
 import src from "@src/utils/src";
+import reducerStateReturnStatement from "@src/utils/reducerReturnStatement";
 
 interface AddToStateProps {
   state: string;
@@ -23,7 +24,6 @@ export default async function addToState(props: AddToStateProps) {
   const stateFL = props.state[0].toLowerCase() + props.state.slice(1);
   const propertyFU = props.property[0].toUpperCase() + props.property.slice(1);
   const setPropertyUS = "SET_" + camelToUpperSnake(props.property);
-  console.log($lf(28), setPropertyUS);
 
   const reducerPipeline = new InjectionPipeline(
     src(`store/reducers/${stateFL}.reducer.ts`)
@@ -34,7 +34,7 @@ export default async function addToState(props: AddToStateProps) {
       {
         caseName: `${stateFU}ActionType.${setPropertyUS}`,
         statements: [
-          statements.reducerStateReturnStatement({
+          reducerStateReturnStatement({
             [props.property]: "action.payload@jcs.identifier",
           }),
         ],
@@ -44,7 +44,7 @@ export default async function addToState(props: AddToStateProps) {
     );
 
   reducerPipeline.injectProperty(
-    { key: props.property, value: props.defaultValue },
+    { property: { key: props.property, value: props.defaultValue } },
     { name: "initialState" }
   );
 

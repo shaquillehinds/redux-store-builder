@@ -1,4 +1,4 @@
-import InjectionPipeline from "tscodeinject";
+import { InjectionPipeline } from "tscodeinject";
 import checkFiles from "../../../utils/fileChecker";
 import { templatePath } from "../../../utils/constants";
 import src from "@src/utils/src";
@@ -41,7 +41,7 @@ export default async function addStateToStore(props: AddToStoreProps) {
       isDefault: true,
     })
     .injectProperty(
-      { key: state, value: `${state}Reducer@jcs.identifier` },
+      { property: { key: state, value: `${state}Reducer@jcs.identifier` } },
       { name: "reducers" }
     )
     .injectFileFromTemplate({

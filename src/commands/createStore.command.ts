@@ -14,7 +14,11 @@ export default function createStoreCommand(program: Command) {
     .action(async () => {
       if (fs.existsSync(src("store/index.ts")))
         throw new Error("Store already created");
-      checkFiles({ autoCreate: requiredFiles as unknown as RequiredFiles[] });
+      checkFiles({
+        autoCreate: requiredFiles.map((rf) =>
+          src(rf)
+        ) as unknown as RequiredFiles[],
+      });
       const packageJSON = fs.readFileSync("package.json", "utf-8");
       let hasRedux = false;
       let hasThunk = false;

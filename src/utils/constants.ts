@@ -20,6 +20,8 @@ export const storeTemplate = `import { legacy_createStore as createStore, applyM
 import thunk from 'redux-thunk';
 import reducers, { State } from './reducers';
 
+//remove the following line when you have action creators
+//@ts-ignore
 export * as actionCreators from './actionCreators';
 
 export const store = createStore(
