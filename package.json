@@ -1,6 +1,6 @@
 {
   "name": "@shaquillehinds/redux-store-builder",
-  "version": "1.2.2",
+  "version": "1.2.3",
   "description": "Create and manipulate a redux store from the command line",
   "repository": {
     "type": "git",
